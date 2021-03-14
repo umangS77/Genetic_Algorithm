@@ -1,267 +1,296 @@
-import numpy as np
-import matplotlib.pyplot as plt
-import client as server
-import random
-import copy
-# %matplotlib inline
+# import numpy as np
+# import client
+# import random
 
-# constants
-TEAM_ID = 'F7U8r4Y2YN0EljgonlgClHUjOIQkHpbnwCcCRi2pTo2GK1m4EZ'
+# SECRET_KEY = 'F7U8r4Y2YN0EljgonlgClHUjOIQkHpbnwCcCRi2pTo2GK1m4EZ'
+
+# overfit_vector =    [9.944698129405788e-19, -1.3673593963253289e-12, -2.3051301190083433e-13, 4.2888566827175184e-11, -1.7544324436394257e-10, -5.714925536936938e-16, 8.306633524512434e-16, 2.98301310801296e-05, -2.1675305838908403e-06, -1.4166414687926064e-08, 9.158557288045874e-10]
+
+
+# FITNESS_FACTOR = 1
+# VECTOR_SIZE = 11
+# POPULATION_COUNT = 8
+# GENERATION_COUNT = 10
+# MUTATION_PROBABILITY = 0.9
+# GENOME_LOWER_LIMIT = -10
+# GENOME_UPPER_LIMIT = 10
+
+
+# class GA:
+
+#     def __init__(self, val: list):
+
+#         self.population = self.generate_population(val)
+#         self.population[0] = np.array(val)
+#         self.fitness = []
+#         self.vector_fitness = []
+#         self.max_fitness_across_generations = None
+#         self.best_fit_vector_across_generations = None
+#         self.train_for_best_fit_vector = None
+#         self.valid_for_best_fit_vector = None
+#         self.TOT_ERR = 1e16
+        
+
+#     def generate_population(self, val: list):
+#         temp = [list(val) for i in range(POPULATION_COUNT)]
+#         temp = np.array(temp, dtype=np.double)
+#         temp =  self.mutation(temp)
+#         temp[0] = val
+#         return temp
+#     def check_fitness(self):
+#         fitness = []
+#         train_errors = []
+#         validation_errors = []
+#         weight_fitness = []
+#         for chrom in self.population:
+            
+#             train_error, validation_error = client.get_errors(SECRET_KEY, list(chrom))
+#             fit = -(train_error * FITNESS_FACTOR + validation_error)
+                
+#             fitness.append(fit)
+#             print(chrom)
+#             print(train_error,validation_error)
+#             train_errors.append(train_error)
+#             validation_errors.append(validation_error)
+#             weight_fitness.append((chrom,fit))
+
+#         fitness = np.array(fitness, dtype=np.double)
+#         self.vector_fitness = weight_fitness
+#         return fitness, train_errors, validation_errors
+
+#     @classmethod
+#     def crossover(self, parent1: np.ndarray, parent2: np.ndarray):
+#         def execute_crossover(parent1, parent2):
+#             cutoff = np.random.randint(VECTOR_SIZE)
+#             c1 = parent2
+#             c1[0:cutoff] = parent1[0:cutoff]
+#             c2 = parent1
+#             c2[0:cutoff] = parent2[0:cutoff]
+#             return c1,c2
+
+#         return execute_crossover(parent1, parent2)
+    
+#     def single_crossover(self, parent1: np.ndarray, parent2:np.ndarray):
+#         cutoff = np.random.randint(11)
+#         child = parent2
+#         child[0:cutoff] = parent1[0:cutoff]
+#         return child
+
+#     def mutation(self, population: np.ndarray):
+#         for idx, val in np.ndenumerate(population):
+#             if np.random.random() < MUTATION_PROBABILITY:
+#                 range_lim = val/2000
+#                 popabs = abs(population[idx])
+#                 noise = np.random.uniform(low=-range_lim, high=range_lim)
+#                 population[idx] = population[idx] + noise
+#                 if popabs > 10:
+#                     population[idx] = 10 * (popabs/population[idx])
+#         return population
+
+#     def breed(self):
+#         def Sort_Tuple(tup):
+#             tup.sort(key = lambda x: x[1])  
+#             return tup  
+        
+        
+#         def generate():
+#             fitness,train,valid = self.check_fitness()
+#             self.vector_fitness = Sort_Tuple(self.vector_fitness)
+#             self.vector_fitness.reverse()            
+#             self.fitness.append(np.mean(fitness))
+#             self.get_max_fit_vector(fitness,train,valid)
+            
+#             next_gen = []
+#             for i in range(4):
+#                 for j in range(i+1,4):
+#                     parent1 = self.vector_fitness[i][0]
+#                     parent2 = self.vector_fitness[j][0]
+#                     child = self.single_crossover(parent1,parent2)
+#                     next_gen.append(child)
+            
+#             next_gen.append(self.vector_fitness[0][0])
+#             next_gen.append(self.vector_fitness[1][0])
+            
+#             return np.array(next_gen, dtype=np.double)
+        
+#         next_gen = generate()
+#         self.population = self.mutation(next_gen)
+    
+#     def get_max_fit_vector(self, fitness , train_errors: list, validation_errors: list):
+#         best_idx = np.argmax(fitness)
+#         if (not self.max_fitness_across_generations) or fitness[best_idx] > self.max_fitness_across_generations:
+#             self.max_fitness_across_generations = fitness[best_idx]
+#             self.best_fit_vector_across_generations = self.population[best_idx]
+#             self.train_for_best_fit_vector = train_errors[best_idx]
+#             self.valid_for_best_fit_vector = validation_errors[best_idx]
+#             self.TOT_ERR = self.train_for_best_fit_vector + self.valid_for_best_fit_vector
+
+#     def run_GA(self):
+#         for i in range(GENERATION_COUNT):
+#             self.breed()
+#         return self.best_fit_vector_across_generations, self.max_fitness_across_generations, self.train_for_best_fit_vector, self.valid_for_best_fit_vector
+
+# ga = GA(overfit_vector)
+# best_fit_vector, final_fitness, train_error, validation_error = ga.run_GA()
+# # print('fitness:')
+# # print(final_fitness,train_error,validation_error)
+# print('best fit vector:\n', list(best_fit_vector))
+# print("{:e}".format(ga.TOT_ERR), "{:e}".format(ga.train_for_best_fit_vector), "{:e}".format(ga.valid_for_best_fit_vector))
+
+
+import client
+import random
+import numpy as np
+
+SECRET_KEY = 'F7U8r4Y2YN0EljgonlgClHUjOIQkHpbnwCcCRi2pTo2GK1m4EZ'
+
+# overfit_vector = [9.94844008537157e-19, -1.3673449094175483e-12, -2.307774976787406e-13, 4.2854401512830564e-11, -1.7584139294715718e-10, -5.721186451922296e-16, 8.304875840120217e-16, 2.959497956287452e-05, -2.1821061915897267e-06, -1.4170069270276784e-08, 9.176646493561812e-10]
+
+FITNESS_FACTOR = 1
+VECTOR_SIZE = 11
+POPULATION_COUNT = 4
+GENERATION_COUNT = 6
+MUTATION_PROBABILITY = 0.9
 GENOME_LOWER_LIMIT = -10
 GENOME_UPPER_LIMIT = 10
 
-MUTATION_PROBABILITY = 0.5
-MAX_MUTATE_DEC = 7000 # Used for controlling the effect of noise, lesser it is more it effects the population
 
-GENERATION_COUNT = 3
-
-INITIAL_WEIGHTS = [1.0013525103431561e-18, -1.3647771066206762e-12, -2.294758765524377e-13, 4.618264502368097e-11, -1.761126648521579e-10, -1.7785368087487815e-15, 8.395285643039735e-16, 2.2669757579885254e-05, -1.9838589201201057e-06, -1.5850335493844227e-08, 9.604709485957068e-10]
-# len(INITIAL_WEIGHTS)
-# POPULATION_SIZE = 8
-
-class Darwin:
-    '''
-    This class encapsulates a genetic algorithm runner over population consisting of weight vectors
-    '''
-    CHROMOSOME_SIZE = 11
-    POPULATION_SIZE = 4
+class GA:
 
     def __init__(self, val: list):
-        if len(val) != self.CHROMOSOME_SIZE:
-            raise ValueError
 
-        self.population = self.generate_random_from_seed(val)
+        self.population = self.generate_population(val)
         self.population[0] = np.array(val)
-        self.avg_fitness = [] # maintained across generations
-        self.weight_fitness_map = [] # consists of tuples (vector,fitness)
-        self.max_fitness_across_generations = None
-        self.best_chromosome_across_generations = None
-        self.train_for_best_chromosome = None
-        self.valid_for_best_chromosome = None
+        self.max_fitness = None
+        self.best_fit_vector = None
+        self.train_error_for_best_fit_vector = None
+        self.validation_error_for_best_fit_vector = None
+        self.fitness = []
+        self.vector_fitness = []
+        self.TOT_ERR = 1e18
         
 
-    def generate_random_from_seed(self, val: list) -> np.ndarray:
-        '''
-        Generates a population from a single seed chromosome
-        '''
-        if len(val) != self.CHROMOSOME_SIZE:
-            raise ValueError
-        temp = [list(val) for i in range(self.POPULATION_SIZE)]
+    def generate_population(self, val: list):
+        temp = [list(val) for i in range(POPULATION_COUNT)]
         temp = np.array(temp, dtype=np.double)
-        temp =  self.mutate(temp)
+        temp =  self.mutation(temp)
+        MUTATION_FLAG = 1
         temp[0] = val
         return temp
 
-    def Sort_Tuple(self, tup):
-        tup.sort(key = lambda x: x[1],reverse = True)  
-        return tup  
-        
-    def get_fitness(self):
-        
-        def error_to_fitness(train_err, valid_err):
-            return -(1.2*train_err + valid_err)
-        
+    def run_GA(self):
+        for i in range(GENERATION_COUNT):
+            self.reproduce()
+        return self.best_fit_vector, self.max_fitness, self.train_error_for_best_fit_vector, self.validation_error_for_best_fit_vector
+
+    def check_fitness(self):
         fitness = []
         train_errors = []
-        valid_errors = []
-        weight_fitness = []
-        for chrom in self.population:
-            
-            train_err, valid_err = server.get_errors(TEAM_ID, list(chrom))
-            fit = error_to_fitness(train_err, valid_err)
-                
+        validation_errors = []
+        feature_fitness = []
+        for vector in self.population:
+            print(vector)
+            train_error, validation_error = client.get_errors(SECRET_KEY, list(vector))
+            print(train_error,validation_error)
+            fit = -(train_error * FITNESS_FACTOR + validation_error)
+            feature_fitness.append((vector,fit))
             fitness.append(fit)
-            print(chrom)
-            print(fit)
-            train_errors.append(train_err)
-            valid_errors.append(valid_err)
-            weight_fitness.append((chrom,fit))
-
-        fitness = np.array(fitness, dtype=np.double)
-        self.weight_fitness_map = weight_fitness
-        return fitness, train_errors, valid_errors
-
-    @classmethod
-    def crossover(self, mom: np.ndarray, dad: np.ndarray):
-        '''
-        Generates offsprings out of the two parents
-        '''
+            train_errors.append(train_error)
+            validation_errors.append(validation_error)
             
-        def random_prefix(mom: np.ndarray, dad: np.ndarray):
-            '''
-            Random prefixes and suffixes
-            '''
-            thresh = np.random.randint(self.CHROMOSOME_SIZE) 
-            alice = np.copy(dad)
-            bob = np.copy(mom)
-            alice[0:thresh] = mom[0:thresh]
-            bob[0:thresh] = dad[0:thresh]
-            return alice,bob
+        fitness = np.array(fitness, dtype=np.double)
+        self.vector_fitness = feature_fitness
+        return fitness, train_errors, validation_errors
 
-        return random_prefix(mom, dad)
     
-    def normal_crossover(self, mom: np.ndarray, dad:np.ndarray):
-        thresh = np.random.randint(CHROMOSOME_SIZE)
-        child = np.copy(dad)
-        child[0:thresh] = mom[0:thresh]
+
+    def crossover(self, parent1, parent2):
+        cutoff = np.random.randint(VECTOR_SIZE)
+        c1 = parent2
+        c1[0:cutoff] = parent1[0:cutoff]
+        c2 = parent1
+        c2[0:cutoff] = parent2[0:cutoff]
+        return c1,c2
+    
+    def single_crossover(self, parent1: np.ndarray, parent2:np.ndarray):
+        cutoff = np.random.randint(11)
+        child = parent2
+        child[0:cutoff] = parent1[0:cutoff]
         return child
 
-    @classmethod
-    def mutate(self, population: np.ndarray):
-        '''
-        Mutates the population randomly
-        '''
-        temp_pop = copy.deepcopy(population)
-        def add_gauss_noise(population: np.ndarray):
-            means = np.mean(population, axis=0) # mean of each gene across the population - to keep mutations of level
-            
-            for idx, val in np.ndenumerate(population):
-                if np.random.random() < MUTATION_PROBABILITY:
-                    noise = np.random.normal(loc=means[idx[1]], scale=abs(means[idx[1]]/1000))
-                    population[idx] += noise
+    def mutation(self, feature: np.ndarray):
+        for idx, val in np.ndenumerate(feature):
+            if np.random.random() < MUTATION_PROBABILITY:
+                range_lim = val/2000
+                # popabs = abs(population[idx])
+                noise = np.random.uniform(low=-range_lim, high=range_lim)
+                feature[idx] = feature[idx] + noise
+                if feature[idx] > 10.0:
+                    feature[idx] = 10.0
+                elif feature[idx] < -10.0:
+                    feature[idx] = -10
+        return feature
 
-            return np.clip(population, GENOME_LOWER_LIMIT, GENOME_UPPER_LIMIT)
-        
-        def add_uniform_noise(population: np.ndarray):
-            for idx, val in np.ndenumerate(population):
-                if np.random.random() < MUTATION_PROBABILITY:
-                    range_lim = val/MAX_MUTATE_DEC
-                    noise = np.random.uniform(low=-range_lim, high=range_lim)
-                    population[idx] = population[idx] + noise
-            return np.clip(population, GENOME_LOWER_LIMIT, GENOME_UPPER_LIMIT)
-            
-        temp = add_uniform_noise(population)
-            
-        return temp
-
-    def breed(self):
-        '''
-        Creates the next generation
-        '''
-        def russian_roulette():
-            def get_parent_index(thresholds):
-                draw = np.random.random() # in [0, 1)
-
-                for i in range(len(thresholds)):
-                    if draw < thresholds[i]:
-                        return i
-                return len(thresholds) - 1    
-            
-            fitness, train_errors, valid_errors = self.get_fitness()
-            normalized_fitness = (fitness - np.min(fitness)) / np.ptp(fitness) # in [0,1]
-            
-            self.avg_fitness.append(np.mean(fitness))
-            self.update_best(fitness, train_errors, valid_errors)
-
-            thresholds = []
-            thresh = 0.0
-            fitness_sum = np.sum(normalized_fitness)
-            for val in normalized_fitness:
-                thresh = thresh + (val/fitness_sum)
-                thresholds.append(thresh)
-
-            offsprings = []
-            for i in range(int(self.POPULATION_SIZE/2)):
-                mom = self.population[get_parent_index(thresholds)]
-                dad = self.population[get_parent_index(thresholds)]
-
-                alice, bob = self.crossover(mom, dad)
-                offsprings.append(alice)
-                offsprings.append(bob)
-                
-            return np.array(offsprings, dtype=np.double)
-        
-        def Sort_Tuple(tup):
-            tup.sort(key = lambda x: x[1])  
-            return tup  
+    def reproduce(self):
+        # def Sort_Tuple(tup):
+        #     tup.sort(key = lambda x: x[1])  
+        #     return tup  
         
         
-        def normal_breed():
-            fitness,train,valid = self.get_fitness()
-            self.weight_fitness_map = Sort_Tuple(self.weight_fitness_map)
-            self.weight_fitness_map.reverse()
-            normalized_fitness = (fitness - np.min(fitness)) / np.ptp(fitness) # in [0,1]
-            
-            self.avg_fitness.append(np.mean(fitness))
-            self.update_best(fitness,train,valid)
-            
-            offsprings = []
-            for i in range(4):
-                for j in range(i+1,4):
-                    mom = self.weight_fitness_map[i][0]
-                    dad = self.weight_fitness_map[j][0]
-                    
-                    alice = self.normal_crossover(mom,dad)
-                    offsprings.append(alice)
-            
-            offsprings.append(self.weight_fitness_map[0][0])
-            offsprings.append(self.weight_fitness_map[1][0])
-            
-            return np.array(offsprings, dtype=np.double)
+        # def generate():
+        x=4
+        fitness,train,valid = self.check_fitness()
+        temp_vec = self.vector_fitness
+        temp_vec.sort(key = lambda x: x[1])
+        self.vector_fitness = temp_vec
+        self.vector_fitness.reverse()            
+        self.fitness.append(np.mean(fitness))
+        self.get_max_fit_vector(fitness,train,valid)
         
-        offsprings = russian_roulette()
-        self.population = self.mutate(offsprings)
-    
-    def update_best(self, fitness: np.ndarray, train_errors: list, valid_errors: list):
-        '''
-        Updates the best chromosome across generations parameter from self.population
-        '''
-        best_idx = np.argmax(fitness)
-        if (not self.max_fitness_across_generations) or fitness[best_idx] > self.max_fitness_across_generations:
-            self.max_fitness_across_generations = fitness[best_idx]
-            self.best_chromosome_across_generations = self.population[best_idx]
-            self.train_for_best_chromosome = train_errors[best_idx]
-            self.valid_for_best_chromosome = valid_errors[best_idx]
+        next_gen = []
 
-    def train(self):
-        for i in range(GENERATION_COUNT):
-            self.breed()
+        for i in range(x):
+            for j in range(i+1,x):
+                parent1 = self.vector_fitness[i][0]
+                parent2 = self.vector_fitness[j][0]
+                # child = self.single_crossover(parent1,parent2)
+                next_gen.append((self.single_crossover(parent1,parent2)))
         
-        # plt.plot(self.avg_fitness)
-        # plt.xlabel('Generations', fontsize=12)
-        # plt.ylabel('Best Fitness', fontsize=12)
-        # plt.title('Best Fitness across Generations', fontsize=14)
-        # plt.show()
+        next_gen.append(self.vector_fitness[0][0])
+        next_gen.append(self.vector_fitness[1][0])
+        next_gen = np.array(next_gen, dtype=np.double)
+            # return next_gen
         
-        return self.best_chromosome_across_generations, self.max_fitness_across_generations, self.train_for_best_chromosome, self.valid_for_best_chromosome
+        # next_gen = generate()
+        self.population = self.mutation(next_gen)
 
-darwin = Darwin(INITIAL_WEIGHTS)
+    def get_max_fit_vector(self, fitness , train_errors, validation_errors):
+        idx = np.argmax(fitness)
+        if (not self.max_fitness):
+            self.max_fitness = fitness[idx]
+            self.validation_error_for_best_fit_vector = validation_errors[idx]
+            MAX_FIT_FLAG = 1
+            self.best_fit_vector = self.population[idx]
+            self.train_error_for_best_fit_vector = train_errors[idx]
+            self.TOT_ERR = self.train_error_for_best_fit_vector + self.validation_error_for_best_fit_vector
 
-best_chromosome, final_fitness, train_err, valid_err = darwin.train()
+        elif fitness[idx] > self.max_fitness:
+            self.max_fitness = fitness[idx]
+            # self.TOT_ERR = self.train_error_for_best_fit_vector + self.validation_error_for_best_fit_vector
+            self.validation_error_for_best_fit_vector = validation_errors[idx]
+            self.best_fit_vector = self.population[idx]
+            self.train_error_for_best_fit_vector = train_errors[idx]
+            MAX_FIT_FLAG = 1
+            self.TOT_ERR = self.train_error_for_best_fit_vector + self.validation_error_for_best_fit_vector
+            
 
-print('fitness:')
-print(final_fitness,train_err,valid_err)
 
-# best_chromosome = best_pair[0]
-print('best chromosome')
-print(best_chromosome)
-
-# for parent in next_parents:
-#     print('Vector')
-#     print(parent[0])
-#     print('Fitness:', parent[1])
-#     print('Train:', parent[2], 'Val:', parent[3])
-#     print('')
-
-input()
-# # to prevent submissions on running all cells
-
-print(darwin.max_fitness_across_generations)
-
-# status = server.submit(TEAM_ID, list(best_chromosome))
-# print(status)
-
-# plt.plot(darwin.avg_fitness)
-# plt.xlabel('Generations', fontsize=12)
-# plt.ylabel('Average Fitness', fontsize=12)
-# plt.title('Average Fitness across Generations', fontsize=14)
-# plt.show()
-
-# vec = [-939161.1269820328,-915725.3356427758,-16865011.685222685,-58544095.1510417,-1659263.4978541355,-3265094.570422368,-7180432.299878756,-7223540.998257766]
-# vec = np.array(vec)
-# vec = vec - np.min(vec)
-# vec = vec/(np.ptp(vec))
-# print(vec)
-
-# print(darwin.max_fitness_accross_generations)
+MAX_FIT_FLAG = 0
+ga = GA(overfit_vector)
+MUTATION_FLAG = 0
+best_fit_vector, final_fitness, train_error, validation_error = ga.run_GA()
+# print('fitness:')
+# print(final_fitness,train_error,validation_error)
+print('best fit vector:\n', list(best_fit_vector))
+print("{:e}".format(ga.TOT_ERR), "{:e}".format(ga.train_error_for_best_fit_vector), "{:e}".format(ga.validation_error_for_best_fit_vector))
 
