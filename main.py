@@ -37,6 +37,13 @@ class GA:
         temp =  self.mutation(temp)
         MUTATION_FLAG = 1
         temp[0] = val
+        print("\n")
+        print("\n")
+        print("POPULATION: ")
+        print(temp)
+        print("\n")
+        print("\n")
+
         return temp
 
     def run_GA(self):
@@ -66,11 +73,21 @@ class GA:
     
 
     def crossover(self, parent1, parent2):
+
+        print("parent1 = \n")
+        print(parent1)
+        print("parent2 = \n")
+        print(parent2)
         cutoff = np.random.randint(VECTOR_SIZE)
+        print("cutoff index = ", str(cutoff))
         c1 = parent2
         c1[0:cutoff] = parent1[0:cutoff]
         c2 = parent1
         c2[0:cutoff] = parent2[0:cutoff]
+        print("child 1 = \n")
+        print(c1)
+        print("child 2 = \n")
+        print(c2)
         return c1,c2
     
     def single_crossover(self, parent1: np.ndarray, parent2:np.ndarray):
@@ -80,6 +97,13 @@ class GA:
         return child
 
     def mutation(self, feature: np.ndarray):
+        print("\n")
+        print("\n")
+        print("RECEIVED FOR MUTATTION\n")
+        print(feature)
+        print("\n")
+        print("\n")
+
         for idx, val in np.ndenumerate(feature):
             if np.random.random() < MUTATION_PROBABILITY:
                 range_lim = val/2000
@@ -90,6 +114,13 @@ class GA:
                     feature[idx] = 10.0
                 elif feature[idx] < -10.0:
                     feature[idx] = -10
+        print("\n")
+        print("\n")
+        print("Mutated feature: \n")
+        print(feature)
+        print("\n")
+        print("\n")
+
         return feature
 
     def reproduce(self):
