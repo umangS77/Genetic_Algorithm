@@ -5,9 +5,10 @@ import numpy as np
 
 SECRET_KEY = 'F7U8r4Y2YN0EljgonlgClHUjOIQkHpbnwCcCRi2pTo2GK1m4EZ'
 
-overfit_vector = [9.94844008537157e-19, -1.3673449094175483e-12, -2.307774976787406e-13, 4.2854401512830564e-11, -1.7584139294715718e-10, -5.721186451922296e-16, 8.304875840120217e-16, 2.959497956287452e-05, -2.1821061915897267e-06, -1.4170069270276784e-08, 9.176646493561812e-10]
+overfit_vector =  [9.913363285632425e-19, -1.3660044023098439e-12, -2.2976634673294506e-13, 5.011345743821108e-11, -1.9164245982279888e-10, -5.706609030574798e-16, 9.211488698839471e-16, 3.215026512103773e-05, -2.106822476052596e-06, -1.3806700813570227e-08, 8.639870129205277e-10]
 
-FITNESS_FACTOR = 1
+
+FITNESS_FACTOR = 2
 VECTOR_SIZE = 11
 POPULATION_COUNT = 6
 GENERATION_COUNT = 8
@@ -70,7 +71,11 @@ class GA:
         self.vector_fitness = feature_fitness
         return fitness, train_errors, validation_errors
 
-    
+    def simple_cross(self, parent1: np.ndarray, parent2:np.ndarray):
+        cutoff = np.random.randint(11)
+        child = parent2
+        child[0:cutoff] = parent1[0:cutoff]
+        return child
 
     def crossover(self, parent1, parent2):
 
@@ -90,11 +95,7 @@ class GA:
         print(c2)
         return c1,c2
     
-    def single_crossover(self, parent1: np.ndarray, parent2:np.ndarray):
-        cutoff = np.random.randint(11)
-        child = parent2
-        child[0:cutoff] = parent1[0:cutoff]
-        return child
+    
 
     def mutation(self, feature: np.ndarray):
         print("\n")
@@ -123,104 +124,34 @@ class GA:
 
         return feature
 
-    # def russian_roulette(self):
-    #     def get_parent_index(thresholds):
-    #         draw = np.random.random() # in [0, 1)
-
-    #         for i in range(len(thresholds)):
-    #             if draw < thresholds[i]:
-    #                 return i
-    #         return len(thresholds) - 1    
-        
-    #     fitness, train_errors, valid_errors = self.check_fitness()
-    #     normalized_fitness = (fitness - np.min(fitness)) / np.ptp(fitness) # in [0,1]
-        
-    #     self.max_fitness.append(np.mean(fitness))
-    #     self.get_max_fit_vector(fitness, train_errors, valid_errors)
-
-    #     thresholds = []
-    #     thresh = 0.0
-    #     fitness_sum = np.sum(normalized_fitness)
-    #     for val in normalized_fitness:
-    #         thresh = thresh + (val/fitness_sum)
-    #         thresholds.append(thresh)
-
-    #     offsprings = []
-    #     for i in range(int(self.POP_SIZE/2)):
-    #         mom = self.population[get_parent_index(thresholds)]
-    #         dad = self.population[get_parent_index(thresholds)]
-
-    #         alice, bob = self.crossover(mom, dad)
-    #         offsprings.append(alice)
-    #         offsprings.append(bob)
-            
-    #     return np.array(offsprings, dtype=np.double)
-
     def reproduce(self):
-        def russian_roulette():
-            def get_parent_index(thresholds):
-                draw = np.random.random() # in [0, 1)
+        
+        limit_point = []
+        next_gen = []
+        thresh = 0.0    
+        z = int(POPULATION_COUNT/2)
 
-                for i in range(len(thresholds)):
-                    if draw < thresholds[i]:
-                        return i
-                return len(thresholds) - 1    
+        
+        fitness, train_errors, valid_errors = self.check_fitness()
+        normalized_fitness = (fitness - np.min(fitness)) / np.ptp(fitness)
+        tot_fit = np.sum(normalized_fitness)
+        
+        self.fitness.append(np.mean(fitness))
+        self.get_max_fit_vector(fitness, train_errors, valid_errors)
+
+        for v in normalized_fitness:
+            thresh = thresh + (v/tot_fit)
+            limit_point.append(thresh)
+
+        for i in range(z):
+            p1 = self.population[self.get_parent(limit_point)]
+            p2 = self.population[self.get_parent(limit_point)]
+
+            parent1, parent2 = self.crossover(p1, p2)
+            next_gen.append(parent1)
+            next_gen.append(parent2)
             
-            fitness, train_errors, valid_errors = self.check_fitness()
-            normalized_fitness = (fitness - np.min(fitness)) / np.ptp(fitness) # in [0,1]
-            
-            self.fitness.append(np.mean(fitness))
-            self.get_max_fit_vector(fitness, train_errors, valid_errors)
-
-            thresholds = []
-            thresh = 0.0
-            fitness_sum = np.sum(normalized_fitness)
-            for val in normalized_fitness:
-                thresh = thresh + (val/fitness_sum)
-                thresholds.append(thresh)
-
-            offsprings = []
-            for i in range(int(POPULATION_COUNT/2)):
-                mom = self.population[get_parent_index(thresholds)]
-                dad = self.population[get_parent_index(thresholds)]
-
-                alice, bob = self.crossover(mom, dad)
-                offsprings.append(alice)
-                offsprings.append(bob)
-                
-            return np.array(offsprings, dtype=np.double)
-        # def Sort_Tuple(tup):
-        #     tup.sort(key = lambda x: x[1])  
-        #     return tup  
-        
-        
-        # def generate():
-
-        # x=4
-        # fitness,train,valid = self.check_fitness()
-        # temp_vec = self.vector_fitness
-        # temp_vec.sort(key = lambda x: x[1])
-        # self.vector_fitness = temp_vec
-        # self.vector_fitness.reverse()            
-        # self.fitness.append(np.mean(fitness))
-        # self.get_max_fit_vector(fitness,train,valid)
-        
-        # next_gen = []
-
-        # for i in range(x):
-        #     for j in range(i+1,x):
-        #         parent1 = self.vector_fitness[i][0]
-        #         parent2 = self.vector_fitness[j][0]
-        #         # child = self.single_crossover(parent1,parent2)
-        #         next_gen.append((self.single_crossover(parent1,parent2)))
-        
-        # next_gen.append(self.vector_fitness[0][0])
-        # next_gen.append(self.vector_fitness[1][0])
-        # next_gen = np.array(next_gen, dtype=np.double)
-            # return next_gen
-        
-        # next_gen = generate()
-        next_gen = russian_roulette()
+        next_gen =  np.array(next_gen, dtype=np.double)
         self.population = self.mutation(next_gen)
 
     def get_max_fit_vector(self, fitness , train_errors, validation_errors):
@@ -242,7 +173,17 @@ class GA:
             MAX_FIT_FLAG = 1
             self.TOT_ERR = self.train_error_for_best_fit_vector + self.validation_error_for_best_fit_vector
             
-
+    def get_parent(self,limit_point):
+        v=-1
+        random_num = np.random.random() 
+        for i in range(len(limit_point)):
+            if random_num < limit_point[i]:
+                v=i
+                break
+        if v == -1:
+            return len(limit_point) - 1
+        else:
+            return v
 
 MAX_FIT_FLAG = 0
 ga = GA(overfit_vector)
